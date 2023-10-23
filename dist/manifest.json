@@ -1,0 +1,29 @@
+{
+    "name": "CourseCatalog",
+    "extension-version": "1.0.1",
+    "sdk-version": "7.2.0",
+    "publisher": "UIW",
+    "cards": [
+        {
+            "type": "CourseCatalogCard",
+            "title": "CourseCatalog Card",
+            "displayCardType": "CourseCatalog Card",
+            "description": "This card provides access to the UIW Course Catalog",
+            "componentFile": "CourseCatalogCard-ae0823223a15cf8c0d2b.js",
+            "pageRoute": {
+                "route": "/",
+                "excludeClickSelectors": [
+                    "a"
+                ]
+            }
+        }
+    ],
+    "adminComponents": [],
+    "otherAssets": [],
+    "page": {
+        "componentFile": "Page-4d550d3320ee9250d1a9.js",
+        "allowPublicAccess": false,
+        "fullWidth": false,
+        "backgroundColor": "default"
+    }
+}

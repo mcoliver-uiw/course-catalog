@@ -1,0 +1,5 @@
+.env
+node_modules
+.eslintchache
+.eslintignore
+.eslintrc.json
