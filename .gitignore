@@ -1,5 +1,6 @@
 .env
 node_modules
-.eslintchache
+.babelrc
+.eslintcache
 .eslintignore
 .eslintrc.json
