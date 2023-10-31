@@ -6,20 +6,16 @@ import {
 
 // const customId = 'ControlledDropdownExample';
 const options = [
-    { label: '2023-2024 - Undergraduate', path: '/2023-2024/Undergraduate-Catalog' },
-    { label: '2022-2023 - Undergraduate', path: '/2022-2023/Undergraduate-Catalog' },
-    { label: '2021-2022 - Undergraduate', path: '/2021-2022/Undergraduate-Catalog' },
-    { label: '2020-2021 - Undergraduate', path: '/2020-2021/Undergraduate-Catalog' },
-    { label: '2023-2024 - Graduate', path: '/2023-2024/Graduate-Catalog' },
-    { label: '2022-2023 - Graduate', path: '/2022-2023/Graduate-Catalog' },
-    { label: '2021-2022 - Graduate', path: '/2021-2022/Graduate-Catalog' },
-    { label: '2020-2021 - Graduate', path: '/2020-2021/Graduate-Catalog' },
+    { label: '2023-2024 - Undergraduate', path: '/2023-2024/Undergraduate-Catalog/Course-Descriptions' },
+    { label: '2022-2023 - Undergraduate', path: '/2022-2023/Undergraduate-Catalog/Course-Descriptions' },
+    { label: '2021-2022 - Undergraduate', path: '/2021-2022/Undergraduate-Catalog/Course-Descriptions' },
+    { label: '2020-2021 - Undergraduate', path: '/2020-2021/Catalog/X-Main-Campus-Courses' },
 ];
 
 class CourseCatalog extends Component {
     state = {
         coursesGroups: [],
-        selectedOption: options[0].path,
+        selectedOption: '',
         open: false
     };
 
@@ -34,16 +30,19 @@ class CourseCatalog extends Component {
     }
 
     handleChange = (event) => {
-        const selectedPath = event.detail.value;
+        console.log('handleChange triggered', event);
+        const selectedPath = event.target.value || event.detail.value;
+        console.log('selectedPath', selectedPath);
         this.setState({
             selectedOption: selectedPath,
-            courses: []
+            coursesGroups: []  // Clear previous data
         }, () => {
-            const url = `https://iq2prod1.smartcatalogiq.com/apis/CustomCatalogAPI?path=/sitecore/content/Catalogs/University-of-the-Incarnate-Word${selectedPath}/Course-Descriptions/MUSI-Honors&format=jsonp`;
+            const url = `https://iq2prod1.smartcatalogiq.com/apis/CustomCatalogAPI?path=/sitecore/content/Catalogs/University-of-the-Incarnate-Word${selectedPath}/MUSI-Honors&format=jsonp`;
             this.jsonp(url, 'handleData');
+            console.log('Fetching from URL:', url);
         });
     };
-    
+
     handleData = (data) => {
         const coursesFolder = data.catalog.Courses_Folder.Courses_Folder;
         let courses = [];
@@ -53,18 +52,12 @@ class CourseCatalog extends Component {
             });
         });
         this.setState(prevState => ({
-            coursesGroups: [...prevState.coursesGroups, courses]
+            coursesGroups: [...prevState.coursesGroups, courses, { courses, label: this.state.selectedOption }]
         }));
     };
 
     componentDidMount() {
-
         window.handleData = this.handleData;
-        options.forEach(option => {
-            const url = `https://iq2prod1.smartcatalogiq.com/apis/CustomCatalogAPI?path=/sitecore/content/Catalogs/University-of-the-Incarnate-Word${option.path}/Course-Descriptions/MUSI-Honors&format=jsonp`;
-            this.jsonp(url, 'handleData');
-            console.log(url);
-        });
     }
 
     componentWillUnmount() {
@@ -93,8 +86,9 @@ class CourseCatalog extends Component {
                     }}
                 >
                     <DropdownItem
-                        label="None"
-                        value="None"
+                        label="Select an Option"
+                        value=""
+                        disabled
                     />
                     {options.map(option => {
                         return (
@@ -106,15 +100,15 @@ class CourseCatalog extends Component {
                         );
                     })}
                 </Dropdown>
-                {this.state.coursesGroups.map((courses, index) => (
+                {this.state.coursesGroups.map((group, courses, index) => (
                     <div key={index}>
-                        <h2>{options[index].label}</h2>
-                        {courses.map(course => (
+                        <h2>{group.label}</h2>
+                        {Array.isArray(group.courses) ? group.courses.map(course => (
                             <div key={`${course.subject_name}-${course.course_number}`}>
                                 <h3>{course.subject_name} {course.course_number}: {course.course_name}</h3>
                                 <p>{course.course_description}</p>
                             </div>
-                        ))}
+                        )) : null}
                     </div>
                 ))}
             </div>
