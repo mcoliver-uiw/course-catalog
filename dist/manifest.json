@@ -9,7 +9,7 @@
             "title": "CourseCatalog Card",
             "displayCardType": "CourseCatalog Card",
             "description": "This card provides access to the UIW Course Catalog",
-            "componentFile": "CourseCatalogCard-cc60afc69c45f8ac980a.js",
+            "componentFile": "CourseCatalogCard-179621d6946540eb99ea.js",
             "pageRoute": {
                 "route": "/",
                 "excludeClickSelectors": [
@@ -21,7 +21,7 @@
     "adminComponents": [],
     "otherAssets": [],
     "page": {
-        "componentFile": "Page-1353f3b20b000ccd1bfe.js",
+        "componentFile": "Page-bb719eae36840e908c24.js",
         "allowPublicAccess": false,
         "fullWidth": false,
         "backgroundColor": "default"

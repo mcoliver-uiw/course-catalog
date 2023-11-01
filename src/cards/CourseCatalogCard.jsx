@@ -11,12 +11,32 @@ const options = [
     { label: '2021-2022 - Undergraduate', path: '/2021-2022/Undergraduate-Catalog/Course-Descriptions' },
     { label: '2020-2021 - Undergraduate', path: '/2020-2021/Catalog/X-Main-Campus-Courses' },
 ];
+const courseOptions = [
+    { label: 'Business Accounting', path: '' },
+    { label: '3D Aminmation and Game Design', path: '' },
+    { label: 'Anthropology', path: '' },
+    { label: 'Arabic', path: '' },
+    { label: 'Art History', path: '' },
+    { label: 'Art', path: '' },
+    { label: 'Athletic Training Education', path: '' },
+    { label: 'Business Finance', path: '' },
+    { label: 'International Business', path: '' },
+    { label: 'Biology', path: '' },
+    { label: 'Business Law', path: '' },
+    { label: 'Business Management Decision Systems', path: '' },
+    { label: 'Business Management', path: '' },
+    { label: 'Business Marketing', path: '' },
+    { label: 'Business Professional Golf Management', path: '' },
+    { label: 'Music', path: '/MUSI-Honors' },
+];
 
 class CourseCatalog extends Component {
     state = {
         coursesGroups: [],
         selectedOption: '',
-        open: false
+        selectedCourse: '',
+        catalogOpen: false,
+        courseOpen: false
     };
 
     jsonp(url, callbackName) {
@@ -29,28 +49,35 @@ class CourseCatalog extends Component {
         };
     }
 
-    handleChange = (event) => {
-        console.log('handleChange triggered', event);
+    handleCatalogChange = (event) => {
         const selectedPath = event.target.value || event.detail.value;
-        console.log('selectedPath', selectedPath);
-        this.setState({
-            selectedOption: selectedPath,
-            coursesGroups: []  // Clear previous data
-        }, () => {
-            const url = `https://iq2prod1.smartcatalogiq.com/apis/CustomCatalogAPI?path=/sitecore/content/Catalogs/University-of-the-Incarnate-Word${selectedPath}/MUSI-Honors&format=jsonp`;
-            this.jsonp(url, 'handleData');
-            console.log('Fetching from URL:', url);
-        });
+        this.setState({ selectedOption: selectedPath }, this.fetchData);
+    };
+
+    handleCourseChange = (event) => {
+        const selectedCoursePath = event.target.value || event.detail.value;
+        this.setState({ selectedCourse: selectedCoursePath }, this.fetchData);
+    };
+
+    fetchData = () => {
+        const url = `https://iq2prod1.smartcatalogiq.com/apis/CustomCatalogAPI?path=/sitecore/content/Catalogs/University-of-the-Incarnate-Word${this.state.selectedOption}${this.state.selectedCourse}&format=jsonp`;
+        this.jsonp(url, 'handleData');
+        console.log('Fetching from URL:', url);
     };
 
     handleData = (data) => {
-        const coursesFolder = data.catalog.Courses_Folder.Courses_Folder;
+        const coursesFolder = data.catalog?.Courses_Folder?.Courses_Folder;
         let courses = [];
-        coursesFolder.forEach(folderItem => {
-            folderItem.Course.forEach(courseItem => {
-                courses.push(courseItem);
+
+        if (coursesFolder && Array.isArray(coursesFolder)) {
+            coursesFolder.forEach(folderItem => {
+                if (folderItem.Course && Array.isArray(folderItem.Course)) {
+                    folderItem.Course.forEach(courseItem => {
+                        courses.push(courseItem);
+                    });
+                }
             });
-        });
+        }
         this.setState(prevState => ({
             coursesGroups: [...prevState.coursesGroups, courses, { courses, label: this.state.selectedOption }]
         }));
@@ -67,26 +94,24 @@ class CourseCatalog extends Component {
 
     render() {
         return (
-
-
             <div id="courses-container">
+                {/* catalog year selection */}
                 <Dropdown
-                    // id={`${customId}_Dropdown`}
-                    label="years"
-                    onChange={this.handleChange}
+                    label="catalog"
+                    onChange={this.handleCatalogChange}
                     value={this.state.selectedOption}
-                    open={this.state.open}
+                    open={this.state.catalogOpen}
                     onOpen={(event) => {
                         console.log('*** onOpen handler called ***', event);
-                        this.setState({ open: true });
+                        this.setState({ catalogOpen: true });
                     }}
                     onClose={(event) => {
                         console.log('*** onClose handler called ***', event);
-                        this.setState({ open: false });
+                        this.setState({ catalogOpen: false });
                     }}
                 >
                     <DropdownItem
-                        label="Select an Option"
+                        label="Select a Catalog"
                         value=""
                         disabled
                     />
@@ -98,6 +123,37 @@ class CourseCatalog extends Component {
                                 value={option.path}
                             />
                         );
+                    })}
+                </Dropdown>
+                {/* course major selection */}
+                <Dropdown
+                    label="courses"
+                    onChange={this.handleCourseChange}
+                    value={this.state.selectedCourse}
+                    open={this.state.courseOpen}
+                    onOpen={(event) => {
+                        console.log('*** onOpen handler called ***', event);
+                        this.setState({ courseOpen: true });
+                    }}
+                    onClose={(event) => {
+                        console.log('*** onClose handler called ***', event);
+                        this.setState({ courseOpen: false });
+                    }}
+                >
+                    <DropdownItem
+                        label="Select a Course"
+                        value=""
+                        disabled
+                    />
+                    {courseOptions.map(course => {
+                        return (
+                            <DropdownItem
+                                key={course.label}
+                                label={course.label}
+                                value={course.path}
+                            />
+                        );
+
                     })}
                 </Dropdown>
                 {this.state.coursesGroups.map((group, courses, index) => (
